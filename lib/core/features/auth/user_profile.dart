@@ -7,19 +7,15 @@ class UserProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('User Profile')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("👤 Name: ${userData['firstName']} ${userData['lastName']}"),
-            Text("📧 Email: ${userData['email']}"),
-            Text("🔑 Token: ${userData['token']}"),
-          ],
-        ),
-      ),
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        CircleAvatar(radius: 40, child: Icon(Icons.person, size: 40)),
+        const SizedBox(height: 20),
+        Text('Name: ${userData['firstName']} ${userData['lastName']}'),
+        Text('Email: ${userData['email']}'),
+        Text('Username: ${userData['username']}'),
+      ],
     );
   }
 }

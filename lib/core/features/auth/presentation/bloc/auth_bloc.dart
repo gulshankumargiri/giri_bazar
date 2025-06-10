@@ -1,40 +1,44 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../shared_storage_services/storage_services.dart';
+
 import '../../domain/auth_logic_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  Map<String, dynamic>? _userData; // 🧠 Store user data
 
   AuthBloc(this._authRepository) : super(AuthInitial()) {
     on<LoginRequested>(_onLoginRequested);
-    on<CheckLoginStatus>(_onCheckingLogginStatus);
-    on<LogOutRequested>(_onLogOutRequested);
+    on<CheckLoginStatus>(_onCheckLoginStatus);
+    on<LogOutRequested>(_onLogoutRequested);
   }
 
-  Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
+  void _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-     final userData= await _authRepository.login(event.username, event.password);
-      emit(AuthSuccess(userData));
+      final user = await _authRepository.login(event.username, event.password);
+      _userData = user;
+      emit(AuthSuccess(user));
     } catch (e) {
-      emit(AuthFailure(failure: e.toString()));
+      emit(AuthFailure( failure: e.toString(),));
     }
   }
 
-  Future<void> _onCheckingLogginStatus(CheckLoginStatus event, Emitter<AuthState> emit) async {
-    emit(AuthLoading());
-    final token = await StorageService().getToken();
-    if (token != null && token.isNotEmpty) {
-      emit(AuthSuccess({}));
+  void _onCheckLoginStatus(CheckLoginStatus event, Emitter<AuthState> emit) async {
+    final isLoggedIn = await _authRepository.isLoggedIn();
+    if (isLoggedIn && _userData != null) {
+      emit(AuthSuccess(_userData!));
     } else {
       emit(AuthInitial());
     }
   }
 
-  Future<void> _onLogOutRequested(LogOutRequested event, Emitter<AuthState> emit) async {
+  void _onLogoutRequested(LogOutRequested event, Emitter<AuthState> emit) async {
     await _authRepository.logOut();
+    _userData = null;
     emit(AuthInitial());
   }
+
+  Map<String, dynamic>? get userData => _userData;
 }

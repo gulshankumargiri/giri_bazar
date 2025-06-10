@@ -7,15 +7,14 @@ import 'core/shared_storage_services/storage_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final token = await StorageService().getToken();
-
+  final storage = StorageService();
+  final token = await storage.getToken();
   runApp(MyApp(initialToken: token));
 }
 
 class MyApp extends StatelessWidget {
   final String? initialToken;
-
-  const MyApp({super.key,this.initialToken});
+  const MyApp({super.key, this.initialToken});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(initialToken: initialToken),
+        home: SplashScreen(initalToken: initialToken),
       ),
     );
   }
